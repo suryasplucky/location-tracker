@@ -1,0 +1,170 @@
+.view-container {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.card h1 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 2.5em;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.controls .button.active {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.latest-location {
+  margin: 30px 0;
+  padding: 25px;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 12px;
+  border: 2px solid #667eea;
+}
+
+.latest-location h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+}
+
+.location-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.location-coords {
+  flex: 1;
+  min-width: 250px;
+}
+
+.location-coords p {
+  margin: 10px 0;
+  color: #555;
+  font-size: 1.1em;
+}
+
+.locations-list {
+  margin-top: 40px;
+}
+
+.locations-list h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.locations-container {
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.location-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin: 10px 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  transition: transform 0.2s;
+}
+
+.location-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.location-details {
+  flex: 1;
+}
+
+.location-coord {
+  margin: 5px 0;
+  color: #555;
+  font-size: 0.95em;
+}
+
+.location-coord .label {
+  font-weight: 600;
+  color: #333;
+  margin-right: 5px;
+}
+
+.location-time {
+  margin-top: 8px;
+  color: #888;
+  font-size: 0.85em;
+}
+
+.map-link-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1.2em;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: inline-block;
+}
+
+.map-link-button:hover {
+  background: #5568d3;
+}
+
+.map-container {
+  margin-top: 25px;
+  width: 100%;
+}
+
+.map-container h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+.location-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Scrollbar styling */
+.locations-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.locations-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.locations-container::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 4px;
+}
+
+.locations-container::-webkit-scrollbar-thumb:hover {
+  background: #5568d3;
+}
+

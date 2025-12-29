@@ -1,0 +1,137 @@
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card h1 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 2.5em;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 1.1em;
+}
+
+.form-group {
+  margin: 20px 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+.link-section {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.link-section h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.info-box {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border-left: 4px solid #667eea;
+}
+
+.info-box p {
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+}
+
+.info-box ol {
+  margin-left: 20px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.info-box li {
+  margin: 8px 0;
+}
+
+.file-generated-box {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px solid #667eea;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.file-generated-box h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.8em;
+}
+
+.file-instruction {
+  color: #555;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.download-button-large {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 18px 40px;
+  font-size: 1.3em;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  margin: 15px 0;
+}
+
+.download-button-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.download-button-large:active {
+  transform: translateY(0);
+}
+
+.file-note {
+  color: #666;
+  font-size: 0.95em;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+.file-options {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.file-options h4 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
