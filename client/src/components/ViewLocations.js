@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './ViewLocations.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+// On Vercel, API is on same domain, so use relative path or env variable
+const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001/api');
 
 function ViewLocations() {
   const { linkId } = useParams();
