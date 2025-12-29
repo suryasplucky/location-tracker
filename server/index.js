@@ -445,11 +445,15 @@ app.get('/api/download/:linkId', (req, res) => {
       return res.status(404).json({ success: false, error: 'Link not found' });
     }
     
-    // Get the actual server URL - use the request host or environment variable
-    const protocol = req.protocol || 'http';
-    const host = req.get('host') || process.env.SERVER_HOST || 'localhost:3001';
-    const serverUrl = process.env.BASE_URL ? process.env.BASE_URL.replace(':3000', ':3001') : `${protocol}://${host}`;
-    const baseUrl = process.env.BASE_URL || serverUrl.replace(':3001', ':3000');
+    // Detect if running on Vercel
+    const isVercel = process.env.VERCEL || process.env.VERCEL_URL;
+    const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+    const protocol = req.protocol || 'https';
+    const host = req.get('host') || process.env.VERCEL_URL || 'localhost:3000';
+    
+    // On Vercel, frontend and backend are on same domain
+    const serverUrl = process.env.BACKEND_URL || (isVercel ? `https://${host}` : `${protocol}://${host.replace(':3000', ':3001')}`);
+    const baseUrl = process.env.BASE_URL || process.env.FRONTEND_URL || vercelUrl || (isVercel ? `https://${host}` : serverUrl.replace(':3001', ':3000'));
     
     // Read and embed image as base64 for offline use
     let imageBase64 = '';
