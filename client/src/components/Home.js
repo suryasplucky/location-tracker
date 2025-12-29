@@ -118,7 +118,7 @@ function Home() {
       // Create a temporary link to trigger download
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `NewYear2026-${linkId.substring(0, 8)}.html`;
+      link.download = `NewYear2026-${linkId.substring(0, 8)}.svg`;
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
