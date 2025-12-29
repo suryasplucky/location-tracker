@@ -30,13 +30,17 @@ app.post('/api/links/generate', (req, res) => {
     const { userId, mediaType = 'image' } = req.body;
     const linkId = uuidv4();
     
-    // Frontend URL (for shareable link)
-    const frontendUrl = process.env.FRONTEND_URL || process.env.BASE_URL || 'http://localhost:3000';
+    // Detect if running on Vercel
+    const isVercel = process.env.VERCEL || process.env.VERCEL_URL;
+    const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+    const protocol = req.protocol || 'https';
+    const host = req.get('host') || process.env.VERCEL_URL || 'localhost:3000';
     
-    // Backend URL (for API endpoints)
-    const protocol = req.protocol || 'http';
-    const host = req.get('host') || process.env.SERVER_HOST || 'localhost:3001';
-    const backendUrl = process.env.BACKEND_URL || `${protocol}://${host}`;
+    // Frontend URL (for shareable link) - on Vercel, same domain
+    const frontendUrl = process.env.FRONTEND_URL || process.env.BASE_URL || vercelUrl || (isVercel ? `https://${host}` : 'http://localhost:3000');
+    
+    // Backend URL (for API endpoints) - on Vercel, same domain as frontend
+    const backendUrl = process.env.BACKEND_URL || (isVercel ? `https://${host}` : `${protocol}://${host.replace(':3000', ':3001')}`);
     
     const shareableLink = `${frontendUrl}/track/${linkId}`;
     
@@ -75,11 +79,15 @@ app.get('/api/media/:linkId', (req, res) => {
       return res.status(404).send('File not found');
     }
     
-    // Get the actual server URL from the request
-    const protocol = req.protocol || 'http';
-    const host = req.get('host') || 'localhost:3001';
-    const serverUrl = `${protocol}://${host}`;
-    const baseUrl = process.env.BASE_URL || serverUrl.replace(':3001', ':3000');
+    // Detect if running on Vercel
+    const isVercel = process.env.VERCEL || process.env.VERCEL_URL;
+    const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+    const protocol = req.protocol || 'https';
+    const host = req.get('host') || process.env.VERCEL_URL || 'localhost:3000';
+    
+    // On Vercel, frontend and backend are on same domain
+    const serverUrl = isVercel ? `https://${host}` : `${protocol}://${host.replace(':3000', ':3001')}`;
+    const baseUrl = process.env.BASE_URL || process.env.FRONTEND_URL || vercelUrl || (isVercel ? `https://${host}` : serverUrl.replace(':3001', ':3000'));
     const imageUrl = `${baseUrl}/images/newyear2026.webp`;
     
     // Create HTML with New Year 2026 theme that silently tracks
@@ -935,14 +943,23 @@ app.get('/api/links/user/:userId', (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API available at http://localhost:${PORT}/api`);
-  if (process.env.BACKEND_URL) {
-    console.log(`Backend URL: ${process.env.BACKEND_URL}`);
-  }
-  if (process.env.FRONTEND_URL) {
-    console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
-  }
-});
+// On Vercel, export app for serverless functions (don't start server)
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  // Start server for local development or other platforms
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`API available at http://localhost:${PORT}/api`);
+    if (process.env.BACKEND_URL) {
+      console.log(`Backend URL: ${process.env.BACKEND_URL}`);
+    }
+    if (process.env.FRONTEND_URL) {
+      console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
+    }
+    if (process.env.VERCEL_URL) {
+      console.log(`Vercel URL: https://${process.env.VERCEL_URL}`);
+    }
+  });
+}
 
