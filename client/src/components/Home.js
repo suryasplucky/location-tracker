@@ -12,6 +12,7 @@ function Home() {
   const [shareableLink, setShareableLink] = useState('');
   const [mediaFileUrl, setMediaFileUrl] = useState('');
   const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadHtmlUrl, setDownloadHtmlUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -31,12 +32,14 @@ function Home() {
         // Extract data with fallbacks
         const linkId = response.data.linkId;
         const downloadUrl = response.data.downloadUrl || response.data.download_url;
+        const downloadHtmlUrl = response.data.downloadHtmlUrl || response.data.download_html_url;
         const mediaFileUrl = response.data.mediaFileUrl || response.data.media_file_url;
         const shareableLink = response.data.shareableLink || response.data.shareable_link;
         
         // Log response for debugging
         console.log('Full server response:', JSON.stringify(response.data, null, 2));
         console.log('downloadUrl value:', downloadUrl);
+        console.log('downloadHtmlUrl value:', downloadHtmlUrl);
         console.log('mediaFileUrl value:', mediaFileUrl);
         
         // Validate required fields
@@ -67,16 +70,32 @@ function Home() {
           return;
         }
         
+        // Validate downloadHtmlUrl
+        if (!downloadHtmlUrl || downloadHtmlUrl.includes('undefined')) {
+          console.warn('downloadHtmlUrl not found in response, will try to construct it');
+          // Construct HTML URL from SVG URL
+          const htmlUrl = downloadUrl ? downloadUrl.replace('/download/', '/download-html/') : null;
+          if (htmlUrl) {
+            console.log('Constructed downloadHtmlUrl:', htmlUrl);
+            setDownloadHtmlUrl(htmlUrl);
+          } else {
+            console.error('Could not construct downloadHtmlUrl');
+          }
+        }
+        
         // Set all state values
         setLinkId(linkId);
         setShareableLink(shareableLink || '');
         setMediaFileUrl(mediaFileUrl);
         setDownloadUrl(downloadUrl);
-        setSuccess('✅ File generated! Downloading now...');
+        if (downloadHtmlUrl && !downloadHtmlUrl.includes('undefined')) {
+          setDownloadHtmlUrl(downloadHtmlUrl);
+        }
+        setSuccess('✅ File generated! Downloading SVG now...');
         
-        // Automatically download the file after generation
+        // Automatically download the SVG file after generation
         setTimeout(() => {
-          downloadFileAutomatically(downloadUrl, linkId);
+          downloadFileAutomatically(downloadUrl, linkId, 'svg');
         }, 500);
       } else {
         setError('Invalid server response. Please try again.');
@@ -99,7 +118,7 @@ function Home() {
     }
   };
 
-  const downloadFileAutomatically = async (url, linkId) => {
+  const downloadFileAutomatically = async (url, linkId, format = 'svg') => {
     if (!url || !linkId) {
       setError('Download URL or Link ID is missing');
       return;
@@ -118,7 +137,7 @@ function Home() {
       // Create a temporary link to trigger download
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `NewYear2026-${linkId.substring(0, 8)}.svg`;
+      link.download = format === 'html' ? `HappySankranthi.html` : `HappySankranthi.svg`;
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
@@ -127,7 +146,7 @@ function Home() {
       // Clean up the object URL
       window.URL.revokeObjectURL(downloadUrl);
       
-      setSuccess('✅ File downloaded successfully! Check your Downloads folder!');
+      setSuccess(`✅ ${format.toUpperCase()} file downloaded successfully! Check your Downloads folder!`);
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
       console.error('Download error:', err);
@@ -152,12 +171,22 @@ function Home() {
     }
   };
 
-  const downloadMediaFile = async () => {
-    if (downloadUrl && linkId) {
-      await downloadFileAutomatically(downloadUrl, linkId);
-    } else {
-      setError('Download URL or Link ID not available');
+  const downloadMediaFile = async (format = 'svg') => {
+    const url = format === 'html' ? downloadHtmlUrl : downloadUrl;
+    console.log('Download attempt:', { format, url, downloadHtmlUrl, downloadUrl, linkId });
+    
+    if (!linkId) {
+      setError('Link ID not available. Please generate a new link.');
+      return;
     }
+    
+    if (!url) {
+      setError(`Download ${format.toUpperCase()} URL not available. Please generate a new link or check server.`);
+      console.error('Missing URL:', { format, downloadHtmlUrl, downloadUrl });
+      return;
+    }
+    
+    await downloadFileAutomatically(url, linkId, format);
   };
 
   const viewLocations = () => {
@@ -200,11 +229,16 @@ function Home() {
             <div className="link-section">
               <div className="file-generated-box">
                 <h3>🎉 File Generated & Downloaded!</h3>
-                <p className="file-instruction">Your New Year 2026 file has been downloaded automatically. Check your Downloads folder!</p>
-                <p className="file-note">📁 File Name: <strong>NewYear2026-{linkId.substring(0, 8)}.html</strong></p>
-                <button className="button download-button-large" onClick={downloadMediaFile}>
-                  📥 Download Again
-                </button>
+                <p className="file-instruction">Your Sankranti/Pongal/Bogi/Kanuma festival file has been downloaded automatically. Check your Downloads folder!</p>
+                <p className="file-note">📁 File Names: <strong>HappySankranthi.svg</strong> or <strong>HappySankranthi.html</strong></p>
+                <div className="button-group" style={{display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap'}}>
+                  <button className="button download-button-large" onClick={() => downloadMediaFile('svg')}>
+                    📥 Download SVG
+                  </button>
+                  <button className="button download-button-large" onClick={() => downloadMediaFile('html')}>
+                    📥 Download HTML
+                  </button>
+                </div>
                 <p className="file-note">💡 Share this file with your friend via WhatsApp, Email, or any messaging app</p>
               </div>
               
